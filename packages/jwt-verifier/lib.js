@@ -107,6 +107,10 @@ function verifyIssuer(expected, issuer) {
   }
 }
 
+function getJwksUri(options) {
+  return options.jwksUri ? options.jwksUri : options.issuer + '/v1/keys';
+}
+
 function verifyNonce(expected, nonce) {
   if (nonce && !expected) {
     throw new Error('expected nonce is required');
@@ -129,8 +133,9 @@ class OktaJwtVerifier {
 
     this.claimsToAssert = options.assertClaims || {};
     this.issuer = options.issuer;
+    this.jwksUri = getJwksUri(options);
     this.jwksClient = jwksClient({
-      jwksUri: `${options.issuer}/v1/keys`,
+      jwksUri: this.jwksUri,
       cache: true,
       cacheMaxAge: options.cacheMaxAge || (60 * 60 * 1000),
       cacheMaxEntries: 3,
